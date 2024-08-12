@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap'); /* Import a different font for the lines */
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .click-bux {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 1.2em;
+            z-index: 10;
+        }
+
+        .shop-container {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+
+        .product-container {
+            background-color: #222;
+            width: 30%;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .product-container:hover {
+            transform: scale(1.05);
+        }
+
+        .product-container img {
+            width: 100%;
+            max-width: 150px;
+            border-radius: 10px;
+        }
+
+        .product-name {
+            margin-top: 10px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .product-price {
+            margin-top: 5px;
+            font-size: 1em;
+            color: #ffcc00;
+            text-align: center;
+        }
+
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s;
+        }
+
+        .popup img {
+            max-width: 90%;
+            max-height: 70%;
+            border-radius: 15px;
+        }
+
+        .popup-text {
+            color: white;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-family: 'Roboto', sans-serif; /* Apply the new font for the generated lines */
+        }
+
+        .back-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background-color: #ffcc00;
+            color: black;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 1em;
+            cursor: pointer;
+            z-index: 101;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .product-container {
+                width: 45%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-container {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="click-bux">Click Bux: <span id="clickBux">0</span></div>
+
+    <div class="shop-container">
+        <div class="product-container" id="x2Clicks">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu-fgaziOh3OCsRnOzcIUY8TJ-Ya8cpq-6kA&s" alt="x2 Clicks">
+            <div class="product-name">x2 Clicks</div>
+            <div class="product-price">Price: 100 Click Bux</div>
+        </div>
+        <div class="product-container" id="x2Coins">
+            <img src="https://i.pinimg.com/originals/8f/7e/67/8f7e676cc3fc73c3032aa8545907e870.gif" alt="x2 Coins">
+            <div class="product-name">x2 Coins</div>
+            <div class="product-price">Price: 150 Click Bux</div>
+        </div>
+        <div class="product-container" id="mystery">
+            <img src="https://media1.tenor.com/m/dbhikcdeyrsAAAAC/scary-mewing.gif" alt="Mystery">
+            <div class="product-name">Mystery</div>
+            <div class="product-price">Price: 500 Click Bux</div>
+        </div>
+        <div class="product-container" id="aura">
+            <img src="https://64.media.tumblr.com/4d391811c84374654e589e79465a534d/aa4f1d97c99e5cc4-bd/s400x600/e879717d00a422e19d613b80e3ef7d2886c6415f.gifv" alt="+10000 Aura">
+            <div class="product-name">+10000 Aura</div>
+            <div class="product-price">Price: 300 Click Bux</div>
+        </div>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="back-button" id="backButton">Back</div>
+        <div class="popup-text" id="popupText"></div>
+        <button id="generateButton" style="margin-top: 20px;">Generate</button>
+    </div>
+
+    <script>
+        let clickBux = parseInt(localStorage.getItem('clickBux')) || 0;
+        const clickBuxElement = document.getElementById('clickBux');
+        const popup = document.getElementById('popup');
+        const popupText = document.getElementById('popupText');
+        const generateButton = document.getElementById('generateButton');
+        const backButton = document.getElementById('backButton');
+
+        clickBuxElement.textContent = clickBux;
+
+        function updateClickBux(amount) {
+            clickBux -= amount;
+            localStorage.setItem('clickBux', clickBux);
+            clickBuxElement.textContent = clickBux;
+        }
+
+        document.getElementById('x2Clicks').addEventListener('click', () => {
+            if (clickBux >= 100) {
+                updateClickBux(100);
+                localStorage.setItem('x2ClicksPurchased', true);
+                alert("x2 Clicks Purchased!");
+            } else {
+                alert("Insufficient Click Bux");
+            }
+        });
+
+        document.getElementById('x2Coins').addEventListener('click', () => {
+            if (clickBux >= 150) {
+                updateClickBux(150);
+                localStorage.setItem('x2CoinsPurchased', true);
+                alert("x2 Coins Purchased!");
+            } else {
+                alert("Insufficient Click Bux");
+            }
+        });
+
+        document.getElementById('mystery').addEventListener('click', () => {
+            if (clickBux >= 500) {
+                updateClickBux(500);
+                popupText.textContent = "Zainab caught lacking in 4k 🥰";
+                popup.style.visibility = 'visible';
+                popup.style.opacity = '1';
+            } else {
+                alert("Insufficient Click Bux");
+            }
+        });
+
+        document.getElementById('aura').addEventListener('click', () => {
+            if (clickBux >= 300) {
+                updateClickBux(300);
+                popupText.textContent = "U won +10000 Aura";
+                popup.style.visibility = 'visible';
+                popup.style.opacity = '1';
+            } else {
+                alert("Insufficient Click Bux");
+            }
+        });
+
+        generateButton.addEventListener('click', () => {
+            const saddeningLines = [
+               "The saddest thing is realizing how much you were willing to give for someone who was never willing to give the same.",
+            "One of the hardest lessons in life is letting go, whether it’s guilt, anger, love, or loss.",
+            "I didn’t lose you. You lost me. You’ll search for me inside of everyone you’re with and I won’t be found.",
+            "It’s amazing how someone can break your heart and you can still love them with all the little pieces.",
+            "The saddest thing is to be a passing moment in someone’s life when you were a lifetime for them.",
+            "Sometimes, memories are the worst things to have.",
+            "It’s sad when someone can walk right by you and pretend you were never a big part of their life.",
+            "The hardest part is waking up in the morning, remembering what you had, and realizing it’s gone forever.",
+            "One of the most difficult tasks in life is removing someone from your heart.",
+            "It’s hard to wait around for something you know might never happen, but it’s even harder to give up when you know it’s everything you want.",
+            "Sometimes, you just have to accept the fact that some people only enter your life as temporary happiness.",
+            "The saddest thing is when you’re feeling real down, you look around, and realize that there’s no shoulder for you.",
+            "It’s hard to forget someone who gave you so much to remember.",
+            "There comes a time when walking away is the best for everyone.",
+            "It’s sad to know I’m done. But looking back, I’ve got a lot of great memories.",
+            "The saddest thing about betrayal is that it never comes from your enemies.",
+            "The worst kind of pain is when you’re smiling just to stop the tears from falling.",
+            "The scariest thing about distance is you don’t know if they’ll miss you or forget you.",
+            "The saddest thing is pretending you don’t care when it’s all you seem to think about.",
+            "I think the worst feeling in the world is knowing that someone else could make the person you love smile.",
+            "The hardest part is when you know you are in need of love but you can’t do anything about it.",
+            "The most painful goodbyes are the ones that are never said and never explained.",
+            "It's hard to watch someone you love, love someone else.",
+            "You never realize how much you love someone until they’re gone.",
+            "The saddest thing is when someone leaves your life too soon.",
+            "It’s amazing how much silence can say.",
+            "Sometimes the person you’d take a bullet for ends up being the one behind the gun.",
+            "What hurts more is when you’re not sure if you want them back or not.",
+            "One day you’ll remember me and how much I loved you... then you’ll hate yourself for letting me go.",
+            "Sometimes, the people who are thousands of miles away from you can make you feel better than the ones right beside you.",
+            "The saddest part of life is when the person who gave you the best memories becomes a memory."
+            ];
+            const randomIndex = Math.floor(Math.random() * saddeningLines.length);
+            popupText.textContent = saddeningLines[randomIndex];
+        });
+
+        backButton.addEventListener('click', () => {
+            popup.style.visibility = 'hidden';
+            popup.style.opacity = '0';
+        });
+    </script>
+</body>
+</html>
